@@ -1,0 +1,59 @@
+# db + api + web. Runs offline once weather is cached (make fetch-weather).
+name: ps4
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ps4
+      POSTGRES_PASSWORD: ps4
+      POSTGRES_DB: ps4
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ps4 -d ps4"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  api:
+    build: ./services/api
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://ps4:ps4@db:5432/ps4}
+      TEST_DATABASE_URL: ${TEST_DATABASE_URL:-postgresql+psycopg://ps4:ps4@db:5432/ps4_test}
+      JWT_SECRET: ${JWT_SECRET:-change-me-demo-only}
+    volumes: [".:/repo"]
+    ports: ["8000:8000"]
+    depends_on:
+      db: {condition: service_healthy}
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "app"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+  web:
+    image: node:22-alpine
+    working_dir: /repo/apps/web
+    environment:
+      API_PROXY_TARGET: http://api:8000
+    volumes:
+      - ./apps/web:/repo/apps/web
+      - web_node_modules:/repo/apps/web/node_modules
+    ports: ["5173:5173"]
+    depends_on: [api]
+    command: ["sh", "-c", "npm ci --no-audit --no-fund && npm run dev"]
+    healthcheck:   # healthy only once npm ci finished and Vite serves, so `make up --wait` covers it
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:5173/"]
+      interval: 5s
+      timeout: 3s
+      retries: 60
+      start_period: 10s
+
+volumes:
+  pgdata:
+  web_node_modules:

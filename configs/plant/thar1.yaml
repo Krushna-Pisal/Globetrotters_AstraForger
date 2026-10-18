@@ -1,0 +1,64 @@
+# Fictional demo plant. Not a real asset. Site coordinates are an assumed location in the
+# Bhadla area of Rajasthan, chosen for its high irradiance and documented curtailment in 2025.
+plant:
+  id: THAR1
+  name: "Thar-1 (fictional demo plant)"
+  source_kind: synthetic_reference
+  template: solar_pv_fixed_tilt@1
+  location:
+    lat: 27.54
+    lon: 71.91
+    tz: Asia/Kolkata
+  capacity:
+    dc_kwp: 60000
+    ac_kw: 50000
+    contracted_ac_kw: 50000          # CUF basis in the PPA
+  cod: 2023-04-01                    # commercial operation date (assumed)
+  array:
+    mounting: fixed
+    tilt_deg: 25
+    azimuth_deg_pvlib: 180           # pvlib convention: 180 = south
+    albedo: 0.25
+  module:
+    gamma_pdc_per_c: -0.0035         # -0.35 %/°C, crystalline silicon
+    temperature_model: sapm.open_rack_glass_polymer
+  inverter:
+    model: pvwatts
+    count: 20
+    ac_kw_each: 2500
+    dc_kwp_each: 3000                # DC/AC ratio 1.2 → clipping on clear noons
+    eta_nom: 0.98
+  loss_register:
+    # Applied in BOTH baseline and expected output. Never attributed (they are design, not variance).
+    structural:
+      mismatch: 0.015
+      dc_wiring: 0.015
+      lid_and_nameplate: 0.010
+      export_to_delivery_point: 0.015   # inverter AC → delivery-point meter (transformer + line)
+    # Assumed by the baseline only. Attribution reports ACTUAL − ASSUMED for each (additive fractions of E_potential).
+    attributable_assumed:
+      soiling: 0.020
+      availability: 0.010
+      curtailment: 0.000
+      grid_unavailability: 0.000
+    degradation:
+      annual_fraction: 0.005           # applied as (1 - 0.005 * years_since_cod) in BOTH models
+  meters:
+    - id: MTR-DP
+      role: delivery_point             # settlement boundary meter
+      quantity: energy_export
+      unit: kWh
+  weather_station:
+    id: WS-01
+    quantities: [poa_irradiance, ghi, module_temperature, ambient_temperature, wind_speed, precipitation]
+  hierarchy:
+    blocks:
+      - {id: B1, inverters: [INV-01, INV-02, INV-03, INV-04, INV-05]}
+      - {id: B2, inverters: [INV-06, INV-07, INV-08, INV-09, INV-10]}
+      - {id: B3, inverters: [INV-11, INV-12, INV-13, INV-14, INV-15]}
+      - {id: B4, inverters: [INV-16, INV-17, INV-18, INV-19, INV-20]}
+
+# Schema-only proof that the twin is generic (stretch S5). No performance model is claimed.
+templates_available:
+  - solar_pv_fixed_tilt@1
+  - bess_container@0-stub

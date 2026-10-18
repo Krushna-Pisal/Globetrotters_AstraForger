@@ -1,0 +1,37 @@
+lens: cfo
+version: 1
+decision: "Is the investment case holding, and is the debt safe?"
+cadence: monthly_quarterly
+archetype: strategic
+compare_against: baseline                 # plan vs actual is the CFO's question (settlement still never reads it)
+grain_floor: plant_month                  # no inverters, no intervals
+units: {energy: GWh, money: INR_crore_lakh}
+metrics:
+  - revenue_settled_inr
+  - revenue_baseline_inr
+  - revenue_bridge_inr
+  - energy_accountable_kwh
+  - energy_baseline_p50_kwh
+  - energy_baseline_p90_kwh
+  - energy_bridge_kwh                     # rolled to plant-month, causes only
+  - recoverable_inr
+  - liability_kwh                         # liability_map section rows (D10)
+  - om_ld_inr
+  - cfads_inr
+  - dscr
+  - cuf_actual
+sections: [headline_tiles, revenue_bridge, energy_vs_p50_p90, dscr_vs_covenants, liability_map, escalations]
+materiality:
+  annualised_impact_fraction_of_baseline_revenue: "0.005"   # 0.5 % ≈ ₹13.1 lakh at ₹26.25 cr (illustrative)
+  annualisation: "trailing-6-month run-rate of that cause_code × 2"
+escalation:
+  - {rule: materiality, when: "annualised ₹ impact of a cause_code ≥ threshold"}
+  - {rule: recurrence, when: "same cause_code present in ≥ 3 of the trailing 6 monthly periods", label: "Structural issue"}
+  - {rule: covenant, when: "DSCR (YTD, provisional) < lockup_dscr + 0.05", label: "Covenant watch"}
+escalated_item_fields: [cause_code, assets_count, periods_hit, annualised_impact_inr, bearer, recommended_action, lineage_id]
+omit:
+  - {metric: energy_lost_kwh, scope: "individual events below materiality", reason: "A 3-day inverter outage is noise at portfolio level; it reappears automatically if it recurs or crosses materiality."}
+  - {metric: peer_ratio, reason: "Inverter-level diagnostics would make the CFO a part-time engineer."}
+  - {metric: loss_rate_kwh_per_h, reason: "Real-time operations do not change a monthly investment judgement."}
+  - {metric: open_work_orders, reason: "Same as above."}
+  - {field: raw_sensor_series, reason: "Raw telemetry is evidence, available via authorised lineage drill-down, not a default view."}

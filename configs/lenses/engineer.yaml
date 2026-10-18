@@ -1,0 +1,29 @@
+lens: engineer
+version: 1
+decision: "Is the plant physically healthy, and which component is underperforming?"
+cadence: weekly
+archetype: analytical
+compare_against: expected_output          # never baseline energy or money
+grain_floor: interval_15m                  # finest detail allowed
+units: {energy: kWh}
+metrics:
+  - energy_potential_kwh
+  - expected_band_pct
+  - energy_actual_kwh
+  - energy_lost_kwh                        # by cause bucket, in kWh
+  - pr
+  - pr_25
+  - availability_energy
+  - soiling_ratio
+  - peer_ratio
+  - data_quality_score
+sections: [pr_trend, inverter_heatmap, loss_waterfall_kwh, traces, events_technical, residual_detail]
+event_fields: [id, asset, category, cause_code, start, end, lost_kwh, confidence, evidence, status]
+omit:
+  - {metric: revenue_settled_inr, reason: "Root-cause work stays physics-first; money framing biases which faults get chased."}
+  - {metric: revenue_bridge_inr, reason: "Same as above."}
+  - {metric: recoverable_inr, reason: "Commercial recovery is a finance decision, not a diagnosis."}
+  - {metric: dscr, reason: "Debt covenants do not change what is physically wrong."}
+  - {metric: cfads_inr, reason: "Same as above."}
+  - {metric: energy_baseline_p50_kwh, reason: "The engineer diagnoses against weather-adjusted expected output; the investment target does not change the physics."}
+  - {field: tariff, reason: "Contract prices are commercially sensitive and irrelevant to diagnosis."}

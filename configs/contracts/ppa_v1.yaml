@@ -1,0 +1,53 @@
+# Illustrative PPA modelled on SECI / state-utility solar PPA clause patterns. NOT a real contract.
+# Read only by app.settlement (via app.contracts). Clause ids appear in every settlement line.
+contract:
+  id: PPA-THAR1-v1
+  kind: ppa
+  source_kind: synthetic_contract
+  counterparty: "Illustrative offtaker (SECI-style)"
+  plant_id: THAR1
+  effective_from: 2023-04-01
+  term_years: 25
+  contracted_capacity_kw: 50000
+  delivery_point_meter: MTR-DP
+  contract_year: calendar            # simplification for MVP; real PPAs often use COD anniversaries
+  interpretation: A                  # see docs/02 §6.6 — dispute mode (stretch) adds interpretation B
+
+  tariff:
+    base_inr_per_kwh: "2.50"
+    indexation: none                 # typical for Indian solar PPAs; keep fixed
+
+  cuf:
+    declared_annual: 0.240           # set from approved baseline P50 / (50,000 kW × 8,760 h), rounded to 0.1 %
+    basis: contracted_ac_capacity
+    min_fraction_of_declared: "0.90"
+    max_fraction_of_declared: "1.10"
+
+  clauses:
+    C4.1_energy_charge:
+      settled: monthly
+      rule: "accountable_kwh × tariff"
+    C4.2_excess_generation:
+      settled: annual_true_up
+      rule: "kWh above max_fraction × declared energy are paid at 75 % of tariff"
+      rate_fraction_of_tariff: "0.75"
+    C4.3_shortfall_compensation:
+      settled: annual_true_up
+      rule: "generator pays 25 % of tariff on kWh below the (relaxed) minimum energy"
+      rate_fraction_of_tariff: "0.25"
+      relaxation: "minimum energy is reduced by deemed kWh from C4.4 and C4.5 (interpretation A)"
+    C4.4_backdown_compensation:
+      settled: monthly
+      rule: "0.50 × avg_generation_per_hour(month) × backdown_hours(month) × tariff"
+      fraction: "0.50"
+      avg_generation_per_hour: "accountable_kwh(month) / hours_with_generation(month)"
+      eligible_cause: grid_operator_instruction_non_technical
+    C4.5_grid_unavailability_compensation:
+      settled: annual_true_up
+      rule: "avg_generation_per_hour(year) × max(0, unavailability_hours − threshold) × tariff"
+      threshold_hours_per_year: 175.2            # 2 % of 8,760 h
+      count_window_local: ["08:00", "18:00"]     # only unavailability hours in this window count
+      avg_generation_per_hour: "accountable_kwh(year) / hours_with_generation(year)"
+      rate_fraction_of_tariff: "1.00"
+    C4.6_metering:
+      rule: "settlement uses delivery-point meter MTR-DP; losses before it are borne by the generator"

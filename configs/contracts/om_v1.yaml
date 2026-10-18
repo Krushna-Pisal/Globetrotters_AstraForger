@@ -1,0 +1,33 @@
+# Illustrative O&M contract (owner ↔ O&M contractor). Read by app.om only. NOT a real contract.
+contract:
+  id: OM-THAR1-v1
+  kind: om
+  source_kind: synthetic_contract
+  counterparty: "Illustrative O&M contractor"
+  plant_id: THAR1
+  effective_from: 2023-04-01
+  annual_fee_inr: "18000000"          # ₹1.80 cr (part of baseline opex)
+
+  availability_guarantee:
+    metric: energy_based               # A_E, docs/02 §4.3
+    guarantee: "0.990"
+    assessment_period: annual          # reported monthly as provisional
+    excluded_causes: [grid_unavailability, curtailment, force_majeure, owner_instructed, no_data]
+    liquidated_damages:
+      rule: "max(0, guarantee − A_E) × E_potential_eligible × rate, capped"
+      rate_inr_per_kwh: "2.50"
+      cap_fraction_of_annual_fee: "0.20"   # ₹36 lakh
+
+  response_sla:                        # hours from event start
+    critical:                          # inverter trip / zero output in daylight
+      ack_h: 1
+      onsite_h: 4
+      restore_h: 96                    # spares in contractor scope
+    major:                             # underperformance, partial derate
+      ack_h: 4
+      onsite_h: 24
+      restore_h: 168
+
+  cleaning:
+    in_scope: true
+    interval_days: 15                  # a missed cleaning is a contractor-controllable soiling loss

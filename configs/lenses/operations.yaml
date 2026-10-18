@@ -1,0 +1,31 @@
+lens: operations
+version: 1
+decision: "What do I fix first today, and is the O&M contractor meeting its SLA?"
+cadence: daily_live
+archetype: operational
+compare_against: expected_output          # never the frozen baseline
+grain_floor: asset_inverter               # no string/interval traces
+time_window_default: last_7_days
+units: {energy: MWh, rate: MWh/h}
+metrics:
+  - availability_energy                   # shown against om_v1 guarantee (99.0 %)
+  - loss_rate_kwh_per_h
+  - energy_lost_kwh                       # at work-order grain
+  - soiling_ratio
+  - open_work_orders
+  - mttr_h
+  - sla_breaches
+sections: [availability_vs_guarantee, work_queue, soiling_and_cleaning, curtailment_log]
+event_fields: [id, asset, category, cause_code, start, end, lost_kwh, loss_rate_kwh_per_h, work_order, sla_clock, priority_score, priority_inputs]
+priority:
+  formula: "loss_rate_kwh_per_h × severity_weight × (1 + 0.5 × sla_age_ratio)"
+  severity_weight: {critical: 1.0, major: 0.6, minor: 0.3}
+  show_weights_on_screen: true
+omit:
+  - {metric: dscr, reason: "Covenant health does not change today's work queue."}
+  - {metric: cfads_inr, reason: "Same as above."}
+  - {metric: revenue_settled_inr, reason: "Ops is measured in energy and availability; finance converts to money."}
+  - {metric: recoverable_inr, reason: "LD and claim amounts are settled by finance; Ops sees the availability gap in % and MWh."}
+  - {metric: energy_baseline_p50_kwh, reason: "Ops is accountable to weather-adjusted expected output; a cloudy year is not the operator's fault."}
+  - {metric: pr_25, reason: "Module-level physics is the engineer's job; Ops acts on availability and loss rate."}
+  - {field: tariff, reason: "Not needed to rank work."}

@@ -1,0 +1,64 @@
+# Synthetic scenario year for the fictional plant THAR1.
+# Real inputs: reanalysis weather for the assumed site (2024). Everything else is injected and recorded
+# in ground_truth.json so the engines can be scored. All rows: dataset_id=thar1_demo_2024,
+# source_kind=synthetic_scenario (actuals/events) or weather_estimated (weather).
+scenario:
+  dataset_id: thar1_demo_2024
+  plant_config: configs/plant/thar1.yaml
+  seed: 20241017
+  period: {start: "2024-01-01T00:00:00+05:30", end: "2025-01-01T00:00:00+05:30"}
+  interval_minutes: 15
+
+  weather:
+    primary: open_meteo_archive          # ERA5 hourly: shortwave, direct_normal, diffuse, temperature_2m, wind_speed_10m, precipitation
+    fallback: nasa_power_hourly
+    timestamp_convention: preceding_hour_mean_at_hour_end   # shift to midpoint for solar position
+    downscale_to_15min: clearsky_index    # k = GHI_hourly / GHI_clearsky_hourly_mean; GHI_15 = k × GHI_clearsky_15
+    transposition: perez                  # GHI/DNI/DHI → POA with pvlib.irradiance.get_total_irradiance
+    cache: data/raw/weather/thar1_2024_open_meteo.json
+
+  texture:                                # calibrated on Kaggle Plant 2 (docs/06 §4); replace with fitted values
+    interval_noise_sigma: 0.010           # multiplicative N(1, σ) per inverter-interval, healthy state
+    inverter_efficiency_spread_sigma: 0.005   # fixed per-inverter factor N(1, σ), drawn once
+    meter_noise_sigma: 0.002              # delivery-point meter vs Σ inverters × (1 − export loss)
+
+  soiling:
+    model: linear_accumulation_with_cleaning_and_rain
+    daily_rate_by_month:                  # fraction of E_potential lost per day since last cleaning (assumed)
+      jan: 0.0010
+      feb: 0.0010
+      mar: 0.0025
+      apr: 0.0025
+      may: 0.0025
+      jun: 0.0025
+      jul: 0.0005
+      aug: 0.0005
+      sep: 0.0005
+      oct: 0.0012
+      nov: 0.0012
+      dec: 0.0012
+    rain_reset: {daily_precip_mm_at_least: 5.0, removes_fraction: 0.80}
+    cleaning:
+      first: 2024-01-05
+      interval_days: 15                   # matches om_v1; resets soiling to 0 at 06:00 local
+      missed: [2024-05-04]                # contractor skipped this cleaning → next one 2024-05-19 (controllable)
+
+  events:                                 # local time (Asia/Kolkata). ids are referenced by docs/09 demo script.
+    - {id: E01, kind: equipment_outage, asset: INV-07, status: FAULT_OVERTEMP, cause_code: IGBT_OVERTEMP, start: "2024-04-09T10:15", end: "2024-04-12T10:15", controllable: true, note: "Demo event: 72 h, waiting for spare; within 96 h SLA"}
+    - {id: E02, kind: equipment_outage, asset: INV-07, status: FAULT_OVERTEMP, cause_code: IGBT_OVERTEMP, start: "2024-06-05T11:00", end: "2024-06-06T09:00", controllable: true}
+    - {id: E03, kind: equipment_outage, asset: INV-12, status: FAULT_OVERTEMP, cause_code: IGBT_OVERTEMP, start: "2024-07-16T12:30", end: "2024-07-17T16:30", controllable: true}
+    - {id: E04, kind: equipment_outage, asset: INV-07, status: FAULT_OVERTEMP, cause_code: IGBT_OVERTEMP, start: "2024-08-21T10:00", end: "2024-08-22T10:00", controllable: true}
+    - {id: E05, kind: equipment_outage, asset: INV-12, status: FAULT_OVERTEMP, cause_code: IGBT_OVERTEMP, start: "2024-09-10T13:00", end: "2024-09-15T03:00", controllable: true, note: "110 h → breaches 96 h SLA"}
+    - {id: E06, kind: equipment_outage, asset: INV-12, status: FAULT_OVERTEMP, cause_code: IGBT_OVERTEMP, start: "2024-10-08T09:30", end: "2024-10-09T15:30", controllable: true}
+    - {id: E07, kind: equipment_outage, asset: INV-03, status: FAULT_GRID_ISOLATION, cause_code: ISO_FAULT, start: "2024-02-14T08:00", end: "2024-02-14T14:00", controllable: true}
+    - {id: E08a, kind: grid_unavailability, asset: THAR1, status: OFFLINE, cause_code: LINE_OUTAGE, start: "2024-06-18T09:00", end: "2024-06-18T17:00", controllable: false}
+    - {id: E08b, kind: grid_unavailability, asset: THAR1, status: OFFLINE, cause_code: LINE_OUTAGE, start: "2024-08-03T10:00", end: "2024-08-03T14:00", controllable: false}
+    - {id: E08c, kind: grid_unavailability, asset: THAR1, status: OFFLINE, cause_code: LINE_OUTAGE, start: "2024-11-12T11:00", end: "2024-11-12T13:00", controllable: false, note: "total 14 h ≪ 175.2 h threshold → uncompensated"}
+    - {id: E09, kind: curtailment, asset: THAR1, status: CURTAILED, cause_code: SLDC_BACKDOWN, daily_window: ["11:00", "15:00"], start_date: 2024-10-14, end_date: 2024-10-23, setpoint_kw: 30000, controllable: false, note: "10 days × 4 h = 40 backdown hours; Rajasthan-style transmission constraint"}
+    - {id: E10, kind: comms_loss, asset: INV-15, status: NO_DATA, cause_code: COMMS_LOSS, start: "2024-05-20T12:00", end: "2024-05-20T16:00", controllable: false, note: "inverter keeps producing; meter is complete → data gap, not a loss"}
+    - {id: E11, kind: silent_underperformance, asset: INV-17, status: RUNNING, cause_code: STRING_FUSE, start: "2024-09-01T00:00", end: "2025-01-01T00:00", derate_fraction: 0.08, controllable: true, note: "no status code; must be found by peer comparison as 'suspected'"}
+
+  ground_truth:
+    path: data/processed/thar1_demo_2024/ground_truth.json   # never read by engines; only by tests/scorecard
+    record_per_event: [id, asset, kind, cause_code, start_utc, end_utc, true_lost_kwh_delivery_point]
+    record_soiling_daily: true

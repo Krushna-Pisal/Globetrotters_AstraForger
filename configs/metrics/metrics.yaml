@@ -1,0 +1,302 @@
+# Metric registry: every number any screen shows is one of these. Defined once; computed once.
+# `compute` points at the python function that produces metric_value rows. Lenses only select,
+# re-grain (sum/mean as declared) and convert units — they never compute.
+# Formulas are authoritative in docs/02_DOMAIN_REFERENCE.md (section given in `ref`).
+version: 1
+metrics:
+  - id: energy_potential_kwh
+    label: "Expected (unconstrained) energy"
+    unit: kWh
+    grain: [asset, interval_15m]
+    rollup: sum
+    source_kind: modeled
+    compute: app.performance.expected.energy_potential
+    ref: "02 §3.2"
+    layer: [3, 4]
+    questions: [Q1, Q2]
+
+  - id: expected_band_pct
+    label: "Expected-output uncertainty (±, 95 %)"
+    unit: fraction
+    grain: [asset, day]
+    rollup: none
+    source_kind: modeled
+    compute: app.performance.uncertainty.band
+    ref: "02 §3.4"
+    layer: [4]
+    questions: [Q2]
+
+  - id: energy_actual_kwh
+    label: "Actual inverter AC energy"
+    unit: kWh
+    grain: [asset, interval_15m]
+    rollup: sum
+    source_kind: measured            # or synthetic_scenario, inherited from dataset
+    compute: app.quality.validated.energy_actual
+    ref: "02 §2.2"
+    layer: [5, 6]
+    questions: [Q1]
+
+  - id: energy_accountable_kwh
+    label: "Accountable energy at delivery point"
+    unit: kWh
+    grain: [plant, interval_15m]
+    rollup: sum
+    source_kind: derived
+    compute: app.accounting.ledger.accountable
+    ref: "02 §5.1"
+    layer: [7]
+    questions: [Q3]
+
+  - id: energy_lost_kwh
+    label: "Energy lost"
+    unit: kWh
+    grain: [asset, interval_15m, cause_bucket]
+    rollup: sum
+    source_kind: derived
+    compute: app.attribution.interval.assign_losses
+    ref: "02 §7.2"
+    layer: [11]
+    questions: [Q2, Q5]
+
+  - id: loss_rate_kwh_per_h
+    label: "Energy at risk right now"
+    unit: kWh/h
+    grain: [asset, interval_15m]
+    rollup: sum
+    source_kind: derived
+    compute: app.om.priority.loss_rate
+    ref: "02 §8.3"
+    layer: [5, 11]
+    questions: [Q5]
+
+  - id: pr
+    label: "Performance ratio"
+    unit: fraction
+    grain: [asset, month]
+    rollup: recompute               # ratio of sums, never mean of ratios
+    source_kind: derived
+    compute: app.performance.kpi.performance_ratio
+    ref: "02 §4.1"
+    layer: [9]
+    questions: [Q1]
+
+  - id: pr_25
+    label: "Temperature-corrected PR (25 °C)"
+    unit: fraction
+    grain: [asset, month]
+    rollup: recompute
+    source_kind: derived
+    compute: app.performance.kpi.performance_ratio_25
+    ref: "02 §4.2"
+    layer: [9]
+    questions: [Q1, Q2]
+
+  - id: availability_energy
+    label: "Energy-based availability (O&M basis)"
+    unit: fraction
+    grain: [plant, month]
+    rollup: recompute
+    source_kind: derived
+    compute: app.om.availability.energy_based
+    ref: "02 §4.3"
+    layer: [5, 9]
+    questions: [Q2, Q5]
+
+  - id: soiling_ratio
+    label: "Estimated soiling ratio"
+    unit: fraction
+    grain: [plant, day]
+    rollup: mean
+    source_kind: derived
+    compute: app.attribution.soiling.estimate_ratio
+    ref: "02 §7.3"
+    layer: [11]
+    questions: [Q2, Q5]
+
+  - id: peer_ratio
+    label: "Output vs peer median"
+    unit: fraction
+    grain: [asset, day]
+    rollup: recompute
+    source_kind: derived
+    compute: app.detection.peer.ratio
+    ref: "02 §8.1"
+    layer: [5]
+    questions: [Q2]
+
+  - id: data_quality_score
+    label: "Data quality score"
+    unit: fraction
+    grain: [plant, day]
+    rollup: mean
+    source_kind: derived
+    compute: app.quality.score.daily
+    ref: "02 §2.3"
+    layer: [6]
+    questions: [Q3]
+
+  - id: energy_baseline_p50_kwh
+    label: "Baseline P50 energy"
+    unit: kWh
+    grain: [plant, month]
+    rollup: sum
+    source_kind: synthetic_reference
+    compute: app.baseline.read.p50
+    ref: "02 §3.3"
+    layer: ["3A"]
+    questions: [Q1]
+
+  - id: energy_baseline_p90_kwh
+    label: "Baseline P90 energy"
+    unit: kWh
+    grain: [plant, month]
+    rollup: sum
+    source_kind: synthetic_reference
+    compute: app.baseline.read.p90
+    ref: "02 §3.3"
+    layer: ["3A"]
+    questions: [Q1]
+
+  - id: energy_bridge_kwh
+    label: "Energy bridge step"
+    unit: kWh
+    grain: [plant, month, bridge_step]
+    rollup: sum
+    source_kind: derived
+    compute: app.attribution.energy_bridge.build
+    ref: "02 §7.1"
+    layer: [10, 11]
+    questions: [Q1, Q2, Q5]
+
+  - id: cuf_actual
+    label: "Capacity utilisation factor (AC)"
+    unit: fraction
+    grain: [plant, month]
+    rollup: recompute
+    source_kind: derived
+    compute: app.settlement.cuf.actual
+    ref: "02 §6.2"
+    layer: [8]
+    questions: [Q3]
+
+  - id: revenue_settled_inr
+    label: "Settled PPA revenue"
+    unit: INR
+    grain: [plant, month]
+    rollup: sum
+    source_kind: derived
+    compute: app.settlement.ledger.total
+    ref: "02 §6"
+    layer: [8]
+    questions: [Q3, Q4]
+
+  - id: revenue_baseline_inr
+    label: "Baseline revenue (P50)"
+    unit: INR
+    grain: [plant, month]
+    rollup: sum
+    source_kind: synthetic_reference
+    compute: app.baseline.read.revenue
+    ref: "02 §3.3"
+    layer: ["3A"]
+    questions: [Q1, Q4]
+
+  - id: revenue_bridge_inr
+    label: "Revenue bridge step"
+    unit: INR
+    grain: [plant, month, bridge_step]
+    rollup: sum
+    source_kind: derived
+    compute: app.attribution.revenue_bridge.build
+    ref: "02 §7.5"
+    layer: [10, 11]
+    questions: [Q4]
+
+  - id: liability_kwh
+    label: "Lost energy by bearer"
+    unit: kWh
+    grain: [plant, month, cause_bucket, bearer]
+    rollup: sum
+    source_kind: derived
+    compute: app.attribution.liability.allocate
+    ref: "02 §7.6"
+    layer: [11]
+    questions: [Q5]
+
+  - id: recoverable_inr
+    label: "Recoverable from counterparties"
+    unit: INR
+    grain: [plant, month, bearer]
+    rollup: sum
+    source_kind: derived
+    compute: app.attribution.liability.recoverable
+    ref: "02 §7.6"
+    layer: [8, 11]
+    questions: [Q5]
+
+  - id: om_ld_inr
+    label: "O&M availability LDs"
+    unit: INR
+    grain: [plant, year]
+    rollup: sum
+    source_kind: derived
+    compute: app.om.ld.compute
+    ref: "02 §4.4"
+    layer: [9]
+    questions: [Q5]
+
+  - id: cfads_inr
+    label: "Cash flow available for debt service"
+    unit: INR
+    grain: [plant, month]
+    rollup: sum
+    source_kind: derived
+    compute: app.finance.cfads.compute
+    ref: "02 §9.1"
+    layer: [9]
+    questions: [Q1]
+
+  - id: dscr
+    label: "Debt service coverage ratio"
+    unit: ratio
+    grain: [plant, period_ytd]
+    rollup: recompute
+    source_kind: derived
+    compute: app.finance.dscr.compute
+    ref: "02 §9.2"
+    layer: [9, 10]
+    questions: [Q1]
+
+  - id: open_work_orders
+    label: "Open work orders"
+    unit: count
+    grain: [plant, now]
+    rollup: none
+    source_kind: derived
+    compute: app.om.workorders.open_count
+    ref: "02 §8.3"
+    layer: [5]
+    questions: [Q5]
+
+  - id: mttr_h
+    label: "Mean time to restore"
+    unit: h
+    grain: [plant, month]
+    rollup: recompute
+    source_kind: derived
+    compute: app.om.workorders.mttr
+    ref: "02 §8.3"
+    layer: [5]
+    questions: [Q5]
+
+  - id: sla_breaches
+    label: "SLA breaches"
+    unit: count
+    grain: [plant, month]
+    rollup: sum
+    source_kind: derived
+    compute: app.om.workorders.sla_breaches
+    ref: "02 §8.3"
+    layer: [5]
+    questions: [Q5]

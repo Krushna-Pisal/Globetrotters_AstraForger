@@ -1,0 +1,15 @@
+# Illustrative senior loan terms. Read by app.finance only. NOT a real facility.
+contract:
+  id: LOAN-THAR1-v1
+  kind: loan
+  source_kind: synthetic_contract
+  plant_id: THAR1
+  debt_service:
+    annual_inr: "170000000"           # ₹17.0 cr interest + principal, 2024
+    schedule: monthly_equal            # ₹1.4167 cr per month (quantize per month, last month absorbs rounding)
+  covenants:
+    test: annual_ltm                   # MVP: also show year-to-date DSCR as provisional
+    sizing_dscr: "1.30"
+    lockup_dscr: "1.15"                # distributions to equity stop below this
+    default_dscr: "1.05"
+  cfads_definition: "revenue_settled + om_ld_received - opex - tax_paid - maintenance_capex (± working capital and reserves = 0 in MVP)"

@@ -1,0 +1,57 @@
+# docs/03 §2 — CI fails on violation (T-SET-04). Settlement firewall per D12.
+[importlinter]
+root_package = app
+
+[importlinter:contract:settlement-firewall]
+name = Settlement reads only accounting, contracts and core (D12)
+type = forbidden
+source_modules =
+    app.settlement
+forbidden_modules =
+    app.baseline
+    app.attribution
+    app.finance
+    app.lenses
+    app.om
+    app.performance
+    app.detection
+    app.quality
+    app.twin
+    app.ingest
+    app.scenarios
+    app.metrics
+    app.reconciliation
+    app.api
+
+[importlinter:contract:om-separate]
+name = O&M engine does not import PPA settlement
+type = forbidden
+source_modules =
+    app.om
+forbidden_modules =
+    app.settlement
+    app.baseline
+
+[importlinter:contract:lenses-read-registry-only]
+name = Lenses only read the registry
+type = forbidden
+source_modules =
+    app.lenses
+forbidden_modules =
+    app.performance
+    app.settlement
+    app.attribution
+    app.finance
+    app.om
+    app.accounting
+
+[importlinter:contract:engines-never-read-ground-truth]
+name = Engines never read the scenario ground truth
+type = forbidden
+source_modules =
+    app.detection
+    app.attribution
+    app.performance
+    app.quality
+forbidden_modules =
+    app.scenarios

@@ -1,0 +1,36 @@
+# Baseline v1 = the frozen investment case (guide layer 3A).
+# `make baseline` fills the energy section from the pvlib model run on PVGIS TMY with the SAME
+# loss_register as the expected-output model. A human then runs `make approve-baseline`, which writes
+# the rows to the DB as status=approved. Approved rows are immutable (DB trigger). A change = version 2.
+baseline:
+  plant_id: THAR1
+  version: 1
+  status: draft
+  source_kind: synthetic_reference
+  period: {start: 2024-01-01, end: 2024-12-31}
+  basis:
+    weather: pvgis_tmy_sarah3          # fallback: nasa_power multi-year typical; record which was used
+    model_version: perf-1.0
+    loss_register_ref: configs/plant/thar1.yaml#loss_register
+  uncertainty:
+    sigma_total: 0.065                 # assumed: interannual resource ~4% ⊕ model ~5%
+    z_p90: 1.2816
+    # p90 = p50 * (1 - z_p90 * sigma_total) = p50 * 0.9167
+  energy_kwh:
+    p50_monthly: null                  # 12 values, filled by `make baseline`
+    p50_annual: null                   # sanity range below; outside it → check units/azimuth/tz
+    sanity_range_annual: [95000000, 115000000]   # ≈ 1,580–1,920 kWh/kWp for 60 MWp
+    p90_annual: null
+  finance:                             # INR as strings → Decimal
+    tariff_inr_per_kwh: "2.50"         # case tariff (from PPA at signing)
+    revenue_p50_inr: null              # = p50_annual * tariff
+    opex_inr_annual: "33000000"        # ₹3.30 cr: O&M fee 1.80, insurance 0.50, land 0.40, admin 0.60
+    tax_paid_inr_annual: "7000000"     # ₹0.70 cr (simplified)
+    maintenance_capex_inr_annual: "0"
+    debt_service_inr_annual: "170000000"   # ₹17.0 cr, from loan_v1 schedule
+    # CFADS_case = revenue_p50 - opex - tax - maintenance_capex  (working capital, reserves = 0 in MVP)
+    # Illustrative check at p50 = 105 GWh: 26.25 - 3.30 - 0.70 = 22.25 cr → DSCR 1.31x
+  approval:
+    approved_by: null
+    approved_at: null
+    reason: "Initial investment case"

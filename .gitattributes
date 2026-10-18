@@ -1,0 +1,2 @@
+# LF everywhere: sources are bind-mounted into Linux containers.
+* text=auto eol=lf
