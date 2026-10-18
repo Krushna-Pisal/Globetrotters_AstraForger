@@ -9,6 +9,8 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: 5173,
+    // Bind mounts from Windows/macOS hosts do not deliver file events into the container: poll there.
+    watch: process.env.VITE_POLL ? { usePolling: true, interval: 300 } : undefined,
     proxy: {
       "/v1": apiTarget,
       "/health": apiTarget,

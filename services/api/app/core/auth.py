@@ -1,4 +1,8 @@
-"""Demo JWT auth (docs/03 §4, docs/05 §1). The role comes ONLY from the token, never from a query or body."""
+"""JWT auth (docs/03 §4, docs/05 §1). The role comes ONLY from the token, never from a query or body.
+
+Users log in with a password (app_user, D30). `DEMO_USERS` remain for the optional passwordless demo-login, which is
+off unless DEMO_LOGIN_ENABLED=true, and for tests.
+"""
 
 from datetime import UTC, datetime, timedelta
 from typing import Annotated, Literal
@@ -24,17 +28,28 @@ class Principal(BaseModel):
     sub: str
     role: Role
     plants: tuple[str, ...]
+    name: str = ""
 
 
-def issue_token(user: str, now: datetime | None = None) -> str:
-    if user not in DEMO_USERS:
-        raise ValueError(f"unknown demo user {user!r}")
+def issue_token(
+    user: str,
+    now: datetime | None = None,
+    role: str | None = None,
+    plants: list[str] | None = None,
+    name: str | None = None,
+) -> str:
+    """Token for a user. Without role/plants, `user` must be one of the demo users (tests, demo-login)."""
+    if role is None:
+        if user not in DEMO_USERS:
+            raise ValueError(f"unknown demo user {user!r}")
+        role, plants = DEMO_USERS[user]["role"], DEMO_USERS[user]["plants"]
     settings = get_settings()
     now = now or datetime.now(UTC)
     claims = {
         "sub": user,
-        "role": DEMO_USERS[user]["role"],
-        "plants": DEMO_USERS[user]["plants"],
+        "role": role,
+        "plants": list(plants or []),
+        "name": name or user,
         "iat": int(now.timestamp()),
         "exp": int((now + timedelta(minutes=settings.jwt_ttl_minutes)).timestamp()),
     }
@@ -44,7 +59,12 @@ def issue_token(user: str, now: datetime | None = None) -> str:
 def decode_token(token: str) -> Principal:
     try:
         claims = jwt.decode(token, get_settings().jwt_secret, algorithms=[ALGORITHM])
-        return Principal(sub=claims["sub"], role=claims["role"], plants=tuple(claims["plants"]))
+        return Principal(
+            sub=claims["sub"],
+            role=claims["role"],
+            plants=tuple(claims["plants"]),
+            name=claims.get("name", claims["sub"]),
+        )
     except (jwt.PyJWTError, KeyError, ValueError) as exc:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="unauthenticated") from exc
 

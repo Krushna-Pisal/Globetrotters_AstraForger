@@ -30,7 +30,25 @@ The role is read only from the token.
 | M1 Real slice | Done: Kaggle Plant 2 ingest (`kaggle_p2_2020`), quality flags + score, real-data expected model, peer detection, texture calibration |
 | M2 Synthetic year | Done: twin, Open-Meteo/NASA POWER adapters, 15-min downscaling, pvlib chain + band, scenario generator + ground truth, status/peer detection |
 | M3 Money engines | Done: PVGIS baseline v1 (frozen), contract loaders, accounting ledger, PPA settlement, A_E + LDs + work orders, CFADS/DSCR, baseline API |
-| M4–M7 | Not started. `make pipeline` lists the pending steps (attribution, metrics, reconcile) |
+| Prototype UI | Done: password login, Plant overview, Engineering, Operations, Finance and Baseline pages on real engine data, role-enforced on the server (D30–D32) |
+| M4–M7 | Paused. M4 work in progress is parked on branch `wip/m4-attribution`; `make pipeline` lists the pending steps |
+
+## Prototype UI
+Open http://localhost:5173 after `make demo` (or `make up && make migrate && make seed-users` on an existing database).
+
+| Account | Password | Lands on | Sees |
+|---|---|---|---|
+| `engineer` | `thar1-engineer` | Engineering | kWh vs expected, PR₂₅ trend, inverter × day heatmap, loss waterfall, events with 15-min traces |
+| `operations` | `thar1-operations` | Operations | availability vs 99 % guarantee, ranked work queue with SLA clocks and transitions, cleaning compliance, curtailment log |
+| `cfo` | `thar1-cfo` | Finance | revenue and energy vs P50/P90, DSCR vs covenants, escalations (materiality / recurrence / covenant), settlement lines, CFADS |
+| `presenter` | `thar1-presenter` | Plant overview | every view, plus the month-by-month "three truths" matrix |
+
+Each view ends with an "Out of scope" panel and a "Server stripped N items" receipt; the API refuses to send anything
+outside the role's lens (`configs/lenses/*.yaml`). Demo passwords are for local demos only — set `DEMO_PASSWORD_*` in `.env`.
+
+Suggested demo path: sign in as `presenter` → overview matrix → April on Engineering (INV-07 outage trace) →
+Operations (same event as a work order, SLA met) → Finance in April (event absent, below materiality) → July
+(IGBT_OVERTEMP escalates as a structural issue) → May on Operations (the missed 4 May cleaning).
 
 ## Seeding the data
 ```
@@ -39,6 +57,7 @@ make ingest-kaggle     # needs data/raw/kaggle/*.csv (download from Kaggle yours
 make scenario          # synthetic year thar1_demo_2024 + data/processed/thar1_demo_2024/ground_truth.json
 make baseline          # baseline v1 draft from the TMY; make approve-baseline freezes it (writes declared CUF)
 make pipeline DATASET=thar1_demo_2024   # quality -> expected -> detect -> accounting -> settlement -> om -> finance
+make seed-users        # demo login accounts
 make demo              # all of the above from a clean database, offline once weather is cached (~10 min)
 ```
 
@@ -51,7 +70,7 @@ make demo              # all of the above from a clean database, offline once we
 | 2024 actual | Accountable 105.55 GWh; settlement ₹26.39 cr energy + ₹12.37 lakh backdown (40 h); grid 14 h < 175.2 h → ₹0; no shortfall (deemed hours relax the minimum) |
 | O&M / finance | A_E 99.81 % ≥ 99.0 % → no LD; 9 work orders, 3 SLA breaches (E05 at 110 h, INV-17 open); DSCR_YTD 1.32x |
 
-Known limitations: attribution, metric registry, lenses and screens are M4–M6; the Kaggle licence text is
+Known limitations: attribution, the metric registry and the full lens/lineage API are M4–M5; the Kaggle licence text is
 unverified (manifest says so); 2024 weather is ~11 % below the TMY, so the CFO view will be weather-dominated.
 
 ## Layout

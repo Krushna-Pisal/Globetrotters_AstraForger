@@ -19,6 +19,7 @@ known-third-party = ["alembic"]   # the local alembic/ migrations folder is not 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S105", "S106"]   # demo secrets in tests
 "alembic/versions/**" = ["E501"]   # DDL mirrors docs/04 verbatim
+"app/api/views/queries.py" = ["S608"]   # only module constants / fixed fragments are interpolated; values are bound
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

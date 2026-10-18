@@ -33,24 +33,24 @@ COMMANDS: dict[str, str] = {
     "baseline": "M3",
     "approve-baseline": "M3",
     "scenario": "M2",
+    "seed-users": "UI",
 }
 IMPLEMENTED: dict[str, Callable[[argparse.Namespace], None]] = {}
 STEPS: dict[str, Callable[[Connection, str], None]] = {}
 
 
 def _register() -> None:
-    from pipelines import kaggle, thar1
+    from pipelines import kaggle, thar1, users
 
     IMPLEMENTED["ingest-kaggle"] = kaggle.run
     IMPLEMENTED["fetch-weather"] = thar1.fetch_weather
     IMPLEMENTED["scenario"] = thar1.scenario
+    IMPLEMENTED["seed-users"] = users.run
     STEPS["quality"] = thar1.step_quality
     STEPS["expected"] = thar1.step_expected
     STEPS["detect"] = thar1.step_detect
-    try:
-        from pipelines import m3
-    except ImportError:
-        return
+    from pipelines import m3
+
     IMPLEMENTED["baseline"] = m3.build_baseline
     IMPLEMENTED["approve-baseline"] = m3.approve_baseline
     STEPS.update(m3.STEPS)

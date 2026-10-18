@@ -11,6 +11,13 @@ from fastapi.testclient import TestClient
 from app.core.auth import ROLES, Principal, current_principal, decode_token, issue_token, require_plant
 
 
+@pytest.fixture(autouse=True)
+def _demo_login_on(monkeypatch):
+    from app.core.config import get_settings
+
+    monkeypatch.setattr(get_settings(), "demo_login_enabled", True)
+
+
 @pytest.mark.parametrize("role", ROLES)
 def test_demo_login_issues_role_token(client, role):
     r = client.post("/v1/auth/demo-login", json={"user": role})

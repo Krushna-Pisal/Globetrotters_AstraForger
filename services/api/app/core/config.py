@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     test_database_url: str = "postgresql+psycopg://ps4:ps4@db:5432/ps4_test"
     jwt_secret: str = "change-me-demo-only"
     jwt_ttl_minutes: int = 720
+    demo_login_enabled: bool = False  # passwordless POST /v1/auth/demo-login (off for the prototype)
+    warm_caches: bool = True  # pre-build the default views at API start-up
     configs_dir: Path = REPO_ROOT / "configs"
     data_dir: Path = REPO_ROOT / "data"
 

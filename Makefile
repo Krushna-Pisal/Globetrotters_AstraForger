@@ -7,7 +7,7 @@ API := $(COMPOSE) exec -T api
 WEB := $(COMPOSE) exec -T web
 RUN := $(API) python -m pipelines.run
 
-.PHONY: up down migrate fetch-weather ingest-kaggle baseline approve-baseline scenario pipeline test recon lint demo
+.PHONY: up down migrate seed-users fetch-weather ingest-kaggle baseline approve-baseline scenario pipeline test recon lint demo
 
 up:
 	$(COMPOSE) up -d --build --wait db api web
@@ -17,6 +17,9 @@ down:
 
 migrate:
 	$(API) alembic upgrade head
+
+seed-users:
+	$(RUN) --command seed-users
 
 fetch-weather:
 	$(RUN) --command fetch-weather
@@ -54,6 +57,7 @@ demo:
 	$(COMPOSE) down -v
 	$(MAKE) up
 	$(MAKE) migrate
+	$(MAKE) seed-users
 	$(MAKE) ingest-kaggle
 	$(MAKE) scenario
 	$(MAKE) baseline
