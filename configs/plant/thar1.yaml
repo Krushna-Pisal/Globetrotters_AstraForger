@@ -48,6 +48,20 @@ plant:
       role: delivery_point             # settlement boundary meter
       quantity: energy_export
       unit: kWh
+  # SCADA status dictionary (plant/OEM documentation). Detection maps reported codes to events with it (D17);
+  # it never reads the scenario file. Codes not listed here are treated as normal operation.
+  status_codes:
+    inverter:
+      RUNNING: {normal: true}
+      WAIT_GRID: {normal: true}          # inverter healthy, waiting for the grid (plant OFFLINE)
+      CURTAILED: {normal: true}          # following the plant setpoint
+      FAULT_OVERTEMP: {category: equipment_outage, cause_code: IGBT_OVERTEMP, controllable: true}
+      FAULT_GRID_ISOLATION: {category: equipment_outage, cause_code: ISO_FAULT, controllable: true}
+      OFFLINE: {category: equipment_outage, cause_code: INVERTER_OFFLINE, controllable: true}
+    plant:
+      RUNNING: {normal: true}
+      OFFLINE: {category: grid_unavailability, cause_code: LINE_OUTAGE, controllable: false}
+      CURTAILED: {category: curtailment, cause_code: SLDC_BACKDOWN, controllable: false}
   weather_station:
     id: WS-01
     quantities: [poa_irradiance, ghi, module_temperature, ambient_temperature, wind_speed, precipitation]

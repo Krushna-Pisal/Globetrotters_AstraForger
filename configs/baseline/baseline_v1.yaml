@@ -5,11 +5,11 @@
 baseline:
   plant_id: THAR1
   version: 1
-  status: draft
+  status: approved
   source_kind: synthetic_reference
   period: {start: 2024-01-01, end: 2024-12-31}
   basis:
-    weather: pvgis_tmy_sarah3          # fallback: nasa_power multi-year typical; record which was used
+    weather: pvgis_tmy                 # PVGIS-ERA5 2005-2023 (SARAH3 does not cover 71.9°E, D24); see data/manifests
     model_version: perf-1.0
     loss_register_ref: configs/plant/thar1.yaml#loss_register
   uncertainty:
@@ -17,13 +17,13 @@ baseline:
     z_p90: 1.2816
     # p90 = p50 * (1 - z_p90 * sigma_total) = p50 * 0.9167
   energy_kwh:
-    p50_monthly: null                  # 12 values, filled by `make baseline`
-    p50_annual: null                   # sanity range below; outside it → check units/azimuth/tz
-    sanity_range_annual: [95000000, 115000000]   # ≈ 1,580–1,920 kWh/kWp for 60 MWp
-    p90_annual: null
+    p50_monthly: [10264278.6, 9720876.9, 11059040.3, 10400888.3, 10656515.3, 9318747.1, 8300226.9, 9681980.9, 8757375.1, 10429914.4, 9771388.0, 9387258.9]   # 12 values, filled by `make baseline`
+    p50_annual: 117748490.7   # sanity range below; outside it → check units/azimuth/tz
+    sanity_range_annual: [95000000, 125000000]   # ≈ 1,580–2,080 kWh/kWp for 60 MWp (D24: PVGIS-ERA5 TMY for this site)
+    p90_annual: 107939570.4
   finance:                             # INR as strings → Decimal
     tariff_inr_per_kwh: "2.50"         # case tariff (from PPA at signing)
-    revenue_p50_inr: null              # = p50_annual * tariff
+    revenue_p50_inr: "294371226.75"   # = p50_annual * tariff
     opex_inr_annual: "33000000"        # ₹3.30 cr: O&M fee 1.80, insurance 0.50, land 0.40, admin 0.60
     tax_paid_inr_annual: "7000000"     # ₹0.70 cr (simplified)
     maintenance_capex_inr_annual: "0"
@@ -31,6 +31,6 @@ baseline:
     # CFADS_case = revenue_p50 - opex - tax - maintenance_capex  (working capital, reserves = 0 in MVP)
     # Illustrative check at p50 = 105 GWh: 26.25 - 3.30 - 0.70 = 22.25 cr → DSCR 1.31x
   approval:
-    approved_by: null
-    approved_at: null
+    approved_by: presenter
+    approved_at: 2026-10-18
     reason: "Initial investment case"

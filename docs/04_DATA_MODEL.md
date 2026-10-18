@@ -112,13 +112,20 @@ CREATE TABLE event (
 
 CREATE TABLE work_order (
   id            uuid PRIMARY KEY,
-  event_id      uuid NOT NULL REFERENCES event(id),
+  event_id      uuid NOT NULL REFERENCES event(id) ON DELETE CASCADE,   -- D25
   severity      text NOT NULL CHECK (severity IN ('critical','major','minor')),
   status        wo_status NOT NULL,
   opened_at timestamptz NOT NULL, acked_at timestamptz, onsite_at timestamptz,
   restored_at timestamptz, verified_at timestamptz,
   priority_score double precision, priority_inputs jsonb,
   source_kind   source_kind NOT NULL            -- 'operator' (real) or 'synthetic_scenario'
+);
+
+-- D15: operator records (work-order lifecycle, cleaning log)
+CREATE TABLE operator_log (
+  id uuid PRIMARY KEY, dataset_id text NOT NULL REFERENCES dataset(id), asset_id text NOT NULL REFERENCES asset(id),
+  kind text NOT NULL CHECK (kind IN ('acknowledged','onsite','restored','verified','cleaning')),
+  at timestamptz NOT NULL, note text, source_kind source_kind NOT NULL
 );
 ```
 

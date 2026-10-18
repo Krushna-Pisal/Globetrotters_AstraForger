@@ -1,0 +1,10 @@
+{
+  "attribution": "Weather data by Open-Meteo.com (CC BY 4.0), ERA5 reanalysis, Copernicus Climate Change Service",
+  "license": "CC BY 4.0",
+  "path": "thar1_2024_open_meteo.json",
+  "retrieved_at": "2026-10-18 09:50:24.177158+00:00",
+  "sha256": "d7675de41743295ded7e33d4ddc801887b88998144968417c4b3b5ecbd75c669",
+  "source": "open_meteo_archive",
+  "timestamp_convention": "radiation = mean of preceding hour, hour-end",
+  "url": "https://archive-api.open-meteo.com/v1/archive?latitude=27.54&longitude=71.91&start_date=2023-12-31&end_date=2024-12-31&hourly=shortwave_radiation%2Cdirect_normal_irradiance%2Cdiffuse_radiation%2Ctemperature_2m%2Cwind_speed_10m%2Cprecipitation&timezone=GMT&wind_speed_unit=ms"
+}

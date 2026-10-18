@@ -1,0 +1,30 @@
+{
+  "dataset_id": "kaggle_p2_2020",
+  "date_formats": {
+    "Plant_1_Generation_Data.csv": "%d-%m-%Y %H:%M",
+    "Plant_1_Weather_Sensor_Data.csv": "%Y-%m-%d %H:%M:%S",
+    "Plant_2_Generation_Data.csv": "%Y-%m-%d %H:%M:%S",
+    "Plant_2_Weather_Sensor_Data.csv": "%Y-%m-%d %H:%M:%S"
+  },
+  "files": {
+    "Plant_1_Generation_Data.csv": {
+      "bytes": 4839076,
+      "sha256": "882f75f1c295946633617646cc92343ddb6fb821a2546c82f7e5cc737a13624e"
+    },
+    "Plant_1_Weather_Sensor_Data.csv": {
+      "bytes": 287847,
+      "sha256": "91325041328745c288cb809aebd8b1b59cde54284500902ead1fb393499d6806"
+    },
+    "Plant_2_Generation_Data.csv": {
+      "bytes": 5805157,
+      "sha256": "9b735e9278774d4d1dd4601047315ef50b3793244d892446f6aabf4fae63bd37"
+    },
+    "Plant_2_Weather_Sensor_Data.csv": {
+      "bytes": 301443,
+      "sha256": "cafd80885a51b88521b3301cffa4e4f013e2516fcb3478b439a81855edac3a64"
+    }
+  },
+  "license": "unverified - see the Kaggle dataset page (docs/00 human check)",
+  "source": "https://www.kaggle.com/datasets/anikannal/solar-power-generation-data",
+  "timezone_assumed": "Asia/Kolkata"
+}

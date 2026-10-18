@@ -72,7 +72,7 @@ make fetch-weather    # download + cache weather/TMY to data/raw (only step need
 make ingest-kaggle    # load Kaggle Plant 2 real slice (dataset kaggle_p2_2020)
 make baseline         # build baseline v1 draft from TMY; make approve-baseline freezes it
 make scenario         # generate synthetic year thar1_demo_2024 + ground_truth.json
-make pipeline DATASET=thar1_demo_2024   # expected → detect → accounting → settlement → om → finance → attribution → metrics → reconcile
+make pipeline DATASET=thar1_demo_2024   # quality → expected → detect → accounting → settlement → om → finance → attribution → metrics → reconcile
 make test             # pytest (all) ; make recon = reconciliation suite only
 make lint             # ruff + import-linter + tsc
 make demo             # reset db, seed everything, start app

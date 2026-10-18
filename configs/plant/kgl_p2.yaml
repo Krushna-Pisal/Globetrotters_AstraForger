@@ -1,0 +1,45 @@
+# Kaggle 'Solar Power Generation Data', Plant 2 (PLANT_ID 4136001). Real measured slice (docs/06).
+# The dataset publishes no nameplate, location or orientation. Values marked inferred come from the data (D16).
+plant:
+  id: KGL-P2
+  name: "Kaggle Plant 2 (India, measured)"
+  source_kind: measured
+  template: solar_pv_fixed_tilt@1
+  source_plant_id: 4136001
+  location: {lat: null, lon: null, tz: Asia/Kolkata}   # tz: timestamps are local (irradiance peaks at 12:00)
+  inverter:
+    count: 22
+    rated_ac_kw_inferred: 1349.5   # max over inverters of the per-inverter p99.9 AC_POWER (D16); same model assumed
+  module:
+    gamma_pdc_per_c: -0.0035
+  model:
+    mode: real_data    # docs/02 §3.1 real-data mode: measured irradiance used as POA (assumption), k_i fitted per inverter
+    calibration_days: 7
+  weather_station:
+    id: WS-01
+    source_key: iq8k7ZNt4Mwm3w0
+    quantities: [poa_irradiance, module_temperature, ambient_temperature]
+  hierarchy:
+    inverters:
+      - {id: INV-01, source_key: 4UPUqMRk7TRMgml}
+      - {id: INV-02, source_key: 81aHJ1q11NBPMrL}
+      - {id: INV-03, source_key: 9kRcWv60rDACzjR}
+      - {id: INV-04, source_key: Et9kgGMDl729KT4}
+      - {id: INV-05, source_key: IQ2d7wF4YD8zU1Q}
+      - {id: INV-06, source_key: LYwnQax7tkwH5Cb}
+      - {id: INV-07, source_key: LlT2YUhhzqhg5Sw}
+      - {id: INV-08, source_key: Mx2yZCDsyf6DPfv}
+      - {id: INV-09, source_key: NgDl19wMapZy17u}
+      - {id: INV-10, source_key: PeE6FRyGXUgsRhN}
+      - {id: INV-11, source_key: Qf4GUc1pJu5T6c6}
+      - {id: INV-12, source_key: Quc1TzYxW2pYoWX}
+      - {id: INV-13, source_key: V94E5Ben1TlhnDV}
+      - {id: INV-14, source_key: WcxssY2VbP4hApt}
+      - {id: INV-15, source_key: mqwcsP2rE7J0TFp}
+      - {id: INV-16, source_key: oZ35aAeoifZaQzV}
+      - {id: INV-17, source_key: oZZkBaNadn6DNKz}
+      - {id: INV-18, source_key: q49J1IKaHRwDQnt}
+      - {id: INV-19, source_key: rrq4fwE8jgrTyWY}
+      - {id: INV-20, source_key: vOuJvMaM2sgwLmb}
+      - {id: INV-21, source_key: xMbIugepa2P7lBB}
+      - {id: INV-22, source_key: xoJJ8DcxJEcupym}

@@ -77,12 +77,13 @@ Each `expected_output` row stores `model_version` (e.g. `perf-1.0`) and `inputs_
 plant config hash, model version). Changing any input creates new rows; old rows remain.
 
 ### 3.3 Baseline P50/P90
-- Weather: PVGIS TMY (SARAH3 database covers Asia) for the site; hourly; run the same chain at Δt = 1 h.
+- Weather: PVGIS TMY for the site; hourly; run the same chain at Δt = 1 h. For THAR1 PVGIS serves only PVGIS-ERA5
+  (2005–2023); SARAH3 does not cover 71.9°E (D24). The hh:00 UTC stamp is the hour midpoint (D21).
 - `P50_month = Σ_TMY-month E_potential_dp × (1 − assumed_soiling − assumed_availability − assumed_curtailment − assumed_grid)`
   = `× (1 − 0.020 − 0.010 − 0 − 0) = × 0.970` (additive convention — keeps the bridge exactly closing, §7.1).
 - `P90 = P50 × (1 − 1.2816 × 0.065) = P50 × 0.9167`.
 - Revenue case = `P50 × 2.50`. Opex, tax and debt service come from `baseline_v1.yaml` / `loan_v1.yaml`.
-- Sanity: annual P50 within 95–115 GWh (≈ 1,580–1,920 kWh/kWp). Outside → check azimuth convention, units, timezone shift.
+- Sanity: annual P50 within 95–125 GWh (≈ 1,580–2,080 kWh/kWp; widened in D24). Outside → check azimuth convention, units, timezone shift.
 - Declared CUF for the PPA = `P50_annual / (50,000 × 8,760)` rounded to 0.1 % (*illustrative*: 105 GWh → 24.0 %).
 
 ### 3.4 Uncertainty band

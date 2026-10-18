@@ -2,8 +2,9 @@
 
 from fastapi import FastAPI
 
-from app.api import auth, health
+from app.api import auth, baseline, health
 
 app = FastAPI(title="PS4 Performance Assurance Platform", version="0.1.0")
 app.include_router(health.router)
 app.include_router(auth.router)
+app.include_router(baseline.router)

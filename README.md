@@ -16,6 +16,7 @@ make up        # build and start db (postgres 16), api (FastAPI :8000), web (Vit
 make migrate   # alembic upgrade head
 make test      # pytest (uses a separate ps4_test database, recreated each run)
 make lint      # ruff check + ruff format --check + import-linter + tsc
+make recon     # reconciliation suite only
 ```
 Open http://localhost:5173 (web) and http://localhost:8000/docs (API).
 
@@ -25,11 +26,33 @@ The role is read only from the token.
 ## Status by milestone (docs/07)
 | Milestone | State |
 |---|---|
-| M0 Bootstrap | Done: layout, compose, `/health`, demo JWT login, enums and identity/twin tables, import-linter contracts, CI |
-| M1–M7 | Not started. Their make targets exist and exit with code 2, naming the milestone that implements them |
+| M0 Bootstrap | Done: layout, compose, `/health`, demo JWT login, import-linter contracts, CI |
+| M1 Real slice | Done: Kaggle Plant 2 ingest (`kaggle_p2_2020`), quality flags + score, real-data expected model, peer detection, texture calibration |
+| M2 Synthetic year | Done: twin, Open-Meteo/NASA POWER adapters, 15-min downscaling, pvlib chain + band, scenario generator + ground truth, status/peer detection |
+| M3 Money engines | Done: PVGIS baseline v1 (frozen), contract loaders, accounting ledger, PPA settlement, A_E + LDs + work orders, CFADS/DSCR, baseline API |
+| M4–M7 | Not started. `make pipeline` lists the pending steps (attribution, metrics, reconcile) |
 
-Make targets that are still stubs: `fetch-weather` (M2), `ingest-kaggle` (M1), `baseline`, `approve-baseline` (M3),
-`scenario` (M2), `pipeline` (M2–M4). `make demo` currently resets the database, starts the stack and migrates.
+## Seeding the data
+```
+make fetch-weather     # once, needs internet: Open-Meteo 2024 + PVGIS TMY -> data/raw/weather (cached)
+make ingest-kaggle     # needs data/raw/kaggle/*.csv (download from Kaggle yourself, see docs/06)
+make scenario          # synthetic year thar1_demo_2024 + data/processed/thar1_demo_2024/ground_truth.json
+make baseline          # baseline v1 draft from the TMY; make approve-baseline freezes it (writes declared CUF)
+make pipeline DATASET=thar1_demo_2024   # quality -> expected -> detect -> accounting -> settlement -> om -> finance
+make demo              # all of the above from a clean database, offline once weather is cached (~10 min)
+```
+
+### What the engines produce today (seed 20241017)
+| | Result |
+|---|---|
+| Kaggle Plant 2 | 22 inverters, irradiance in kW/m² (×1000), AC/DC 0.978 (Plant 1: 0.098 → not used); σ_rel 0.086; holdout median daily APE 7.6 %; 16 inverters with real midday drop-outs flagged *suspected* |
+| Detection on THAR1 | All 7 outages (E01–E07) found with exact start/end, 3 grid events, 10 curtailment windows, INV-17 silent derate from 2024-09-01, no false positives; E10 comms loss = 16 `no_data` intervals, no event |
+| Baseline v1 | PVGIS-ERA5 TMY: P50 117.75 GWh, P90 107.94 GWh, ₹29.44 cr; declared CUF 26.9 % (D24) |
+| 2024 actual | Accountable 105.55 GWh; settlement ₹26.39 cr energy + ₹12.37 lakh backdown (40 h); grid 14 h < 175.2 h → ₹0; no shortfall (deemed hours relax the minimum) |
+| O&M / finance | A_E 99.81 % ≥ 99.0 % → no LD; 9 work orders, 3 SLA breaches (E05 at 110 h, INV-17 open); DSCR_YTD 1.32x |
+
+Known limitations: attribution, metric registry, lenses and screens are M4–M6; the Kaggle licence text is
+unverified (manifest says so); 2024 weather is ~11 % below the TMY, so the CFO view will be weather-dominated.
 
 ## Layout
 ```

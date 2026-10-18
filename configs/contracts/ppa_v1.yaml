@@ -18,7 +18,7 @@ contract:
     indexation: none                 # typical for Indian solar PPAs; keep fixed
 
   cuf:
-    declared_annual: 0.240           # set from approved baseline P50 / (50,000 kW × 8,760 h), rounded to 0.1 %
+    declared_annual: 0.269           # set from approved baseline P50 / (50,000 kW × 8,760 h), rounded to 0.1 %
     basis: contracted_ac_capacity
     min_fraction_of_declared: "0.90"
     max_fraction_of_declared: "1.10"

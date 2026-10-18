@@ -17,9 +17,9 @@ scenario:
     transposition: perez                  # GHI/DNI/DHI → POA with pvlib.irradiance.get_total_irradiance
     cache: data/raw/weather/thar1_2024_open_meteo.json
 
-  texture:                                # calibrated on Kaggle Plant 2 (docs/06 §4); replace with fitted values
-    interval_noise_sigma: 0.010           # multiplicative N(1, σ) per inverter-interval, healthy state
-    inverter_efficiency_spread_sigma: 0.005   # fixed per-inverter factor N(1, σ), drawn once
+  texture:                                # calibrated on Kaggle Plant 2 (docs/06 §4) by make ingest-kaggle
+    interval_noise_sigma: 0.0856   # calibrated on kaggle_p2_2020 (M1): pooled sigma_rel
+    inverter_efficiency_spread_sigma: 0.028   # calibrated on kaggle_p2_2020 (M1): robust std of k_i / median k (D20)
     meter_noise_sigma: 0.002              # delivery-point meter vs Σ inverters × (1 − export loss)
 
   soiling:

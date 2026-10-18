@@ -1,0 +1,62 @@
+{
+  "attribution": "PVGIS (c) European Union, 2001-2026",
+  "meteo_db": "ERA5",
+  "months_selected": [
+    {
+      "month": 1,
+      "year": 2018
+    },
+    {
+      "month": 2,
+      "year": 2014
+    },
+    {
+      "month": 3,
+      "year": 2008
+    },
+    {
+      "month": 4,
+      "year": 2019
+    },
+    {
+      "month": 5,
+      "year": 2009
+    },
+    {
+      "month": 6,
+      "year": 2020
+    },
+    {
+      "month": 7,
+      "year": 2010
+    },
+    {
+      "month": 8,
+      "year": 2021
+    },
+    {
+      "month": 9,
+      "year": 2006
+    },
+    {
+      "month": 10,
+      "year": 2007
+    },
+    {
+      "month": 11,
+      "year": 2005
+    },
+    {
+      "month": 12,
+      "year": 2016
+    }
+  ],
+  "path": "thar1_pvgis_tmy.json",
+  "radiation_db": "PVGIS-ERA5",
+  "retrieved_at": "2026-10-18 10:06:52.645250+00:00",
+  "sha256": "29f11cb65454f55592cfced47756b27262fcaf96959fa65089458ad190d2c866",
+  "source": "pvgis_tmy",
+  "timestamp_convention": "hh:00 UTC, treated as hour-start (D21)",
+  "year_max": 2023,
+  "year_min": 2005
+}

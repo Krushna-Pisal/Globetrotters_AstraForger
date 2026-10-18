@@ -48,8 +48,14 @@ lint:
 	$(API) lint-imports
 	$(WEB) npm run typecheck
 
-# M0: reset the database and start the stack. Seeding steps are added as their milestones land.
+# Reset the database and seed everything from cached inputs (offline after `make fetch-weather` ran once).
+# Order matters: ingest-kaggle calibrates the scenario texture before the synthetic year is generated.
 demo:
 	$(COMPOSE) down -v
 	$(MAKE) up
 	$(MAKE) migrate
+	$(MAKE) ingest-kaggle
+	$(MAKE) scenario
+	$(MAKE) baseline
+	$(MAKE) approve-baseline
+	$(MAKE) pipeline DATASET=thar1_demo_2024
