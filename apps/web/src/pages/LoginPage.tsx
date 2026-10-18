@@ -78,7 +78,7 @@ export default function LoginPage() {
         <div className="relative flex items-center gap-3">
           <BrandMark size={34} />
           <div>
-            <p className="text-[15px] font-semibold">Three Truths</p>
+            <p className="text-[15px] font-semibold">TriNexus</p>
             <p className="text-[12px] text-steel-300">Solar performance assurance</p>
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function LoginPage() {
         <div className="w-full max-w-[400px]">
           <div className="mb-6 flex items-center gap-3 lg:hidden">
             <BrandMark size={32} />
-            <p className="text-[16px] font-semibold">Three Truths</p>
+            <p className="text-[16px] font-semibold">TriNexus</p>
           </div>
           <h1 className="text-[22px] font-semibold tracking-tight">Sign in</h1>
           <p className="mt-1 text-[13.5px] text-ink-3">Your role decides which truth you see.</p>

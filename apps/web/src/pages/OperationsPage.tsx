@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CalendarCheck2, CalendarX2, Check, Timer } from "lucide-react";
 import { AppShell, PageFooter } from "../components/AppShell";
 import { AvailabilityTrend, PerformanceIndexChart } from "../components/charts/charts";
-import { EmptyState, Loading, Notice, OmissionsPanel, Panel, StatusPill, TileRow } from "../components/ui";
+import { EmptyState, Loading, Notice, Panel, StatusPill, TileRow } from "../components/ui";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { useLensView, useScope } from "../lib/hooks";
@@ -54,7 +54,6 @@ export default function OperationsPage() {
           <div className="card">
             <EmptyState title="No O&M contract for this dataset">{s.unavailable}</EmptyState>
           </div>
-          <OmissionsPanel omitted={data.omitted} stripped={data.stripped} lens="operations" />
         </div>
       )}
       {data && s && !s.unavailable && (
@@ -181,7 +180,6 @@ export default function OperationsPage() {
               )}
             </Panel>
           </div>
-          <OmissionsPanel omitted={data.omitted} stripped={data.stripped} lens="operations" />
           <PageFooter items={[`Plant ${data.meta.plant_id}`, data.meta.mode.label, `Period ${monthLabel(period ?? data.meta.period)}`, "Availability provisional until the annual assessment"]} />
         </div>
       )}

@@ -4,12 +4,10 @@ import {
   AlertTriangle,
   CheckCircle2,
   CircleDot,
-  EyeOff,
   Info,
   Loader2,
-  ShieldCheck,
 } from "lucide-react";
-import type { MetricCard, Omitted } from "../lib/types";
+import type { MetricCard } from "../lib/types";
 
 /* ------------------------------------------------------------------ brand */
 export function BrandMark({ size = 28 }: { size?: number }) {
@@ -170,40 +168,6 @@ export function Loading({ label = "Loading" }: { label?: string }) {
     <div className="flex items-center justify-center gap-2 py-16 text-ink-3">
       <Loader2 className="animate-spin" size={18} /> {label}…
     </div>
-  );
-}
-
-/* ------------------------------------------------------------------ omissions */
-export function OmissionsPanel({ omitted, stripped, lens }: { omitted: Omitted[]; stripped: { count: number }; lens: string }) {
-  return (
-    <Panel
-      title="Out of scope for this view"
-      subtitle="Left out by rule, not by opinion. Items return through escalation or authorised drill-down."
-      actions={
-        <span
-          className="inline-flex items-center gap-1.5 rounded-md border border-brand-100 bg-brand-50 px-2 py-1 text-[11px] font-semibold text-brand-700"
-          title="Counted on the server before the response was sent; the browser never received these items"
-        >
-          <ShieldCheck size={13} /> Server stripped {stripped.count} item{stripped.count === 1 ? "" : "s"}
-        </span>
-      }
-    >
-      <ul className="grid gap-x-6 gap-y-3 md:grid-cols-2">
-        {omitted.map((o) => (
-          <li key={o.id} className="flex gap-3">
-            <EyeOff size={15} className="mt-0.5 shrink-0 text-ink-4" />
-            <div>
-              <p className="font-mono text-[12px] text-ink-2">
-                {o.id}
-                {o.scope && <span className="ml-2 font-sans text-[11px] text-ink-4">({o.scope})</span>}
-              </p>
-              <p className="text-[13px] text-ink-3">{o.reason}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
-      <p className="mt-3 text-[11px] text-ink-4">Lens contract: configs/lenses/{lens}.yaml — enforced by the API.</p>
-    </Panel>
   );
 }
 

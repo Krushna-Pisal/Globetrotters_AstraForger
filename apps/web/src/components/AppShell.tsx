@@ -41,7 +41,7 @@ export function AppShell({ title, decision, children }: { title: string; decisio
         <div className="flex items-center gap-2.5 border-b border-line px-5 py-4">
           <BrandMark />
           <div className="leading-tight">
-            <p className="text-[14px] font-semibold text-ink">Three Truths</p>
+            <p className="text-[14px] font-semibold text-ink">TriNexus</p>
             <p className="text-[11px] text-ink-3">Performance assurance</p>
           </div>
         </div>

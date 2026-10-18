@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { CircleAlert, Cpu, Search } from "lucide-react";
 import { AppShell, PageFooter } from "../components/AppShell";
 import { DailyEnergyChart, LossWaterfall, PeerHeatmap, PrTrendChart, TraceChart } from "../components/charts/charts";
-import { EmptyState, Loading, Notice, OmissionsPanel, Panel, StatusPill, TileRow } from "../components/ui";
+import { EmptyState, Loading, Notice, Panel, StatusPill, TileRow } from "../components/ui";
 import { api, qs } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { useLensView, useScope } from "../lib/hooks";
@@ -156,7 +156,6 @@ export default function EngineerPage() {
             </Panel>
           </div>
 
-          <OmissionsPanel omitted={data.omitted} stripped={data.stripped} lens="engineer" />
           <PageFooter
             items={[
               `Plant ${data.meta.plant_id}`,

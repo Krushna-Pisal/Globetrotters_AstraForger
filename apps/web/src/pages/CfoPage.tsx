@@ -2,7 +2,7 @@ import { ArrowUpRight, Layers, Lock, Repeat2, Scale, TriangleAlert } from "lucid
 import { Link } from "react-router-dom";
 import { AppShell, PageFooter } from "../components/AppShell";
 import { DscrChart, EnergyVsP50Chart, RevenueChart } from "../components/charts/charts";
-import { EmptyState, Loading, Notice, OmissionsPanel, Panel, ProvisionalBadge, TileRow } from "../components/ui";
+import { EmptyState, Loading, Notice, Panel, ProvisionalBadge, TileRow } from "../components/ui";
 import { useLensView, useScope } from "../lib/hooks";
 import { monthLabel, titleCase } from "../lib/format";
 
@@ -23,7 +23,6 @@ export default function CfoPage() {
           <div className="card">
             <EmptyState title="No investment case for this dataset">{s.unavailable}</EmptyState>
           </div>
-          <OmissionsPanel omitted={data.omitted} stripped={data.stripped} lens="cfo" />
         </div>
       )}
       {data && s && !s.unavailable && (
@@ -177,7 +176,6 @@ export default function CfoPage() {
             </Link>
           </div>
 
-          <OmissionsPanel omitted={data.omitted} stripped={data.stripped} lens="cfo" />
           <PageFooter
             items={[
               `Plant ${data.meta.plant_id}`,

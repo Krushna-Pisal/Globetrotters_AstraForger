@@ -1,4 +1,6 @@
-# One Asset, Three Truths — PS4 Performance Assurance Platform
+# TriNexus — PS4 Performance Assurance Platform
+
+*One asset, three truths.*
 
 One canonical model of a solar plant, one metric registry, and three server-enforced lenses (Engineer, Operations, CFO).
 Start with [`CLAUDE.md`](CLAUDE.md) and [`docs/00_INDEX.md`](docs/00_INDEX.md).
@@ -43,8 +45,8 @@ Open http://localhost:5173 after `make demo` (or `make up && make migrate && mak
 | `cfo` | `thar1-cfo` | Finance | revenue and energy vs P50/P90, DSCR vs covenants, escalations (materiality / recurrence / covenant), settlement lines, CFADS |
 | `presenter` | `thar1-presenter` | Plant overview | every view, plus the month-by-month "three truths" matrix |
 
-Each view ends with an "Out of scope" panel and a "Server stripped N items" receipt; the API refuses to send anything
-outside the role's lens (`configs/lenses/*.yaml`). Demo passwords are for local demos only — set `DEMO_PASSWORD_*` in `.env`.
+The API refuses to send anything outside the role's lens (`configs/lenses/*.yaml`); each payload still lists what was
+omitted and why (`omitted`, `stripped`), but the UI no longer renders that panel. Demo passwords are for local demos only — set `DEMO_PASSWORD_*` in `.env`.
 
 Suggested demo path: sign in as `presenter` → overview matrix → April on Engineering (INV-07 outage trace) →
 Operations (same event as a work order, SLA met) → Finance in April (event absent, below materiality) → July
