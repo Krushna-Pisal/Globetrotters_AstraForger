@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   Lock,
   LogOut,
+  Settings2,
   Wrench,
 } from "lucide-react";
 import { ROLE_LABEL, useAuth } from "../lib/auth";
@@ -25,6 +26,7 @@ export const NAV: NavItem[] = [
   { to: "/operations", label: "Operations", icon: Wrench, roles: ["operations"], caption: "Work queue & SLA" },
   { to: "/cfo", label: "Finance", icon: Landmark, roles: ["cfo"], caption: "Investment case & debt" },
   { to: "/baseline", label: "Baseline history", icon: Lock, roles: ["cfo"], caption: "Frozen P50 / P90" },
+  { to: "/config", label: "Plant configuration", icon: Settings2, roles: ["engineer", "operations", "cfo"], caption: "Site, array & losses" },
 ];
 
 export function AppShell({ title, decision, children }: { title: string; decision?: string; children: ReactNode }) {

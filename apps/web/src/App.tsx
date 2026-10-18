@@ -11,6 +11,7 @@ import EngineerPage from "./pages/EngineerPage";
 import OperationsPage from "./pages/OperationsPage";
 import CfoPage from "./pages/CfoPage";
 import BaselinePage from "./pages/BaselinePage";
+import ConfigPage from "./pages/ConfigPage";
 
 function Protected({ roles, children }: { roles?: Role[]; children: ReactNode }) {
   const { session, can } = useAuth();
@@ -49,6 +50,7 @@ export default function App() {
       <Route path="/operations" element={<Protected roles={["operations"]}><OperationsPage /></Protected>} />
       <Route path="/cfo" element={<Protected roles={["cfo"]}><CfoPage /></Protected>} />
       <Route path="/baseline" element={<Protected roles={["cfo"]}><BaselinePage /></Protected>} />
+      <Route path="/config" element={<Protected><ConfigPage /></Protected>} />
       <Route path="*" element={<Home />} />
     </Routes>
   );
